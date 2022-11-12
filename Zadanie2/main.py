@@ -4,44 +4,63 @@ import time
 from itertools import combinations as get_combinations
 from math import inf
 
-graph1 = [[0, 49, 34, 96, 74],
-          [49, 0, 10, 94, 43],
-          [34, 10, 0, 21, 6],
-          [96, 94, 21, 0, 70],
-          [74, 43, 6, 70, 0]]
+graph1 = [[-1, 81, 50, 18, 75, 39, 107, 77, 87, 43],
+          [81, -1, 76, 21, 37, 26, 34, 58, 66, 15],
+          [50, 76, -1, 24, 14, 58, 100, 68, 33, 30],
+          [18, 21, 24, -1, 19, 58, 68, 62, 84, 81],
+          [75, 37, 14, 19, -1, 31, 60, 65, 29, 91],
+          [39, 26, 58, 58, 31, -1, 64, 21, 42, 46],
+          [107, 34, 100, 68, 60, 64, -1, 15, 55, 16],
+          [77, 58, 68, 62, 65, 21, 15, -1, 17, 34],
+          [87, 66, 33, 84, 29, 42, 55, 17, -1, 68],
+          [43, 15, 30, 81, 91, 46, 16, 34, 68, -1]]
 
 
 def held_karp(graph):
     start = time.time()
     size = len(graph)
-    archive = dict()
+    archive = [None]
+    for subset_size in range(1, size):
+        archive.append(dict())
 
     for i in range(1, size):
-        archive[(tuple([i]), i)] = graph[0][i]
+        archive[1][(tuple([i]), i)] = graph[0][i]
 
     for subset_size in range(2, size):
         subsets = list(get_combinations(range(1, size), subset_size))
         for subset in subsets:
             for vertex in subset:
                 min_val = inf
-                for key in archive.keys():
+                for key in archive[subset_size - 1].keys():
                     key_subset, dest = key
                     smaller_subset = list(subset)
                     smaller_subset.remove(vertex)
                     smaller_subset = tuple(smaller_subset)
                     if key_subset == smaller_subset:
-                        if archive[(smaller_subset, dest)] + graph[dest][vertex] < min_val:
-                            min_val = archive[(smaller_subset, dest)] + graph[dest][vertex]
+                        current_val = archive[subset_size - 1][(smaller_subset, dest)] + graph[dest][vertex]
+                        if current_val < min_val:
+                            min_val = current_val
 
-                archive[(subset, vertex)] = min_val
+                archive[subset_size][(subset, vertex)] = min_val
 
     end = time.time() - start
-    print(archive)
-    # return min_path_cost, min_path, end
+    # for subset_size in archive:
+    #     print(subset_size)
+
+    min_val = inf
+    for key in archive[size - 1].keys():
+        key_subset, dest = key
+        current_val = archive[size - 1][key] + graph[dest][0]
+        if current_val < min_val:
+            min_val = current_val
+
+    print(min_val)
+
+    return min_val, end
 
 
 if __name__ == "__main__":
-    # config_lines = get_file_lines("config.ini")
+    config_lines = get_file_lines("config.ini")
     #
     # adj_matrix, size = load_matrix(config_lines[1])
     # times = []
@@ -57,4 +76,4 @@ if __name__ == "__main__":
     # print(min_path_cost)
     # print(min_path)
     # print(tsp_time)
-    held_karp(graph1, )
+    held_karp(graph1)
