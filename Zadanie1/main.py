@@ -1,7 +1,6 @@
 from sys import maxsize
 from itertools import permutations as get_permutations
 import time
-import csv
 import os
 
 
@@ -13,8 +12,6 @@ def load_matrix(file_name):
         adj_matrix.append([int(i) for i in line.split()])
 
     size = len(adj_matrix)
-    # print(size)
-    # print_matrix(adj_matrix)
     return adj_matrix, size
 
 
@@ -27,7 +24,7 @@ def get_file_lines(filepath):
 
 
 def save_data(data):
-    output_file = 'data.csv'
+    output_file = config_lines[5]
 
     if not os.path.exists(output_file):
         with open(output_file, 'w') as f:
@@ -64,8 +61,6 @@ def tsp(graph, size):
     min_path = list(min_path)
     end = time.time() - start  # koniec pomiaru
 
-    # min_path.insert(0, 0)
-
     return min_path_cost, min_path, end
 
 
@@ -74,12 +69,15 @@ if __name__ == "__main__":
 
     adj_matrix, size = load_matrix("./input/" + config_lines[1])
     times = []
-    for _ in range(1):
+
+    for _ in range(int(config_lines[3])):
         min_path_cost, min_path, tsp_time = tsp(adj_matrix, size)
         times.append(tsp_time)
-    # print(min_path_cost)
-    # print(min_path)
 
-    for tsp_time in times:
-        save_data([min_path, tsp_time])
-    print("koniec")
+    print_matrix(adj_matrix)
+    print(min_path_cost)
+    print(min_path)
+    print(tsp_time)
+    # for tsp_time in times:
+    # save_data([min_path, tsp_time])
+    # print("koniec")
