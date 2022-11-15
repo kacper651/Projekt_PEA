@@ -1,10 +1,10 @@
-from sys import maxsize
 from ulits import load_matrix, get_file_lines, save_data, print_matrix
 import time
 from itertools import combinations as get_combinations
 from math import inf
+import tsplib95
 
-graph1 = [[-1, 81, 50, 18, 75, 39, 107, 77, 87, 43],
+graph1 = [[-1, 81, 50, 18, 75, 39, 107, 77, 87, 43],  # testowy graf, żeby zobaczyć czy metody działają innit bruv
           [81, -1, 76, 21, 37, 26, 34, 58, 66, 15],
           [50, 76, -1, 24, 14, 58, 100, 68, 33, 30],
           [18, 21, 24, -1, 19, 58, 68, 62, 84, 81],
@@ -14,6 +14,17 @@ graph1 = [[-1, 81, 50, 18, 75, 39, 107, 77, 87, 43],
           [77, 58, 68, 62, 65, 21, 15, -1, 17, 34],
           [87, 66, 33, 84, 29, 42, 55, 17, -1, 68],
           [43, 15, 30, 81, 91, 46, 16, 34, 68, -1]]
+
+
+def load_tsp(path):
+    problem = tsplib95.load(path)
+    size = range(len(list(problem.get_nodes())))
+    matrix = [[] for _ in size]
+    for i in size:
+        for j in size:
+            matrix[i].append(problem.get_weight(i, j))
+
+    return matrix
 
 
 def held_karp(graph):
@@ -76,4 +87,5 @@ if __name__ == "__main__":
     # print(min_path_cost)
     # print(min_path)
     # print(tsp_time)
-    held_karp(graph1)
+    print(held_karp(load_tsp(config_lines[1])))
+    print(load_tsp(config_lines[1]))
