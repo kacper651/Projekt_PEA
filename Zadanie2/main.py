@@ -5,6 +5,7 @@ from math import inf
 
 
 def held_karp(graph):
+    min_path = []
     size = len(graph)
     archive = [None]
     prev = [None]
@@ -39,17 +40,24 @@ def held_karp(graph):
 
     min_val = inf
     pre = None
-    min_path = []
     for key in archive[size - 1].keys():
         key_subset, dest = key
         current_val = archive[size - 1][key] + graph[dest][0]
+        #print(archive[size - 1][key], key)
         if current_val < min_val:
             min_val = current_val
             pre = key
 
-    for key in prev[size - 1].keys():
-        key_subset, dest = key
-        current_prev = prev[size - 1][pre]
+    current_set_key = pre
+    for i in range(size - 1, 1, -1):
+        for key in prev[i].keys():
+            key_subset, dest = key
+            if current_set_key == key:
+                min_path.append(dest)
+                # smaller_subset = list(key_subset)
+                # smaller_subset.remove(dest)
+                # smaller_subset = tuple(smaller_subset)
+                # current_set_key = prev[i-1][pre]
 
     end = time.time() - start
 
