@@ -32,14 +32,15 @@ def get_file_lines(filepath):
 
 
 def save_data(data):
-    output_file = get_file_lines("config.ini")[5]
+    config_lines = get_file_lines("config.ini")
+    output_file = config_lines[5]
 
     if not os.path.exists(output_file):
         with open(output_file, 'w') as f:
-            f.write('droga;czas[s]\n')
+            f.write('droga;koszt;czas[s]\n')
 
     with open(output_file, 'a') as f:
-        f.write(f'{data[0]};{str(data[1]).replace(".", ",")}\n')
+        f.write(f'{data[0]};{data[1]};{str(data[2]).replace(".", ",")}\n')
 
 
 def print_matrix(matrix):
