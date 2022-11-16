@@ -1,4 +1,5 @@
 import os
+import tsplib95
 
 
 def load_matrix(file_name):
@@ -8,8 +9,18 @@ def load_matrix(file_name):
     for line in lines:
         adj_matrix.append([int(i) for i in line.split()])
 
-    size = len(adj_matrix)
-    return adj_matrix, size
+    return adj_matrix
+
+
+def load_tsp(path):
+    problem = tsplib95.load(path)
+    size = range(len(list(problem.get_nodes())))
+    matrix = [[] for _ in size]
+    for i in size:
+        for j in size:
+            matrix[i].append(problem.get_weight(i, j))
+
+    return matrix
 
 
 def get_file_lines(filepath):
