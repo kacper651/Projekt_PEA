@@ -33,7 +33,7 @@ def get_file_lines(filepath):
 
 def save_data(data):
     config_lines = get_file_lines("config.ini")
-    output_file = config_lines[5]
+    output_file = config_lines[3]
 
     if not os.path.exists(output_file):
         with open(output_file, 'w') as f:
