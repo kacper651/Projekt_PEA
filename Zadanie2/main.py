@@ -79,7 +79,11 @@ if __name__ == "__main__":
     for tsp_time in times:
         save_data([min_path, min_val, tsp_time])
 
+    print("Macierz:")
     print_matrix(graph)
+    print("Ścieżka:", end=" ")
     print(min_path)
+    print("Koszt:", end=" ")
     print(min_val)
+    print("Czas:", end=" ")
     print(sum(times)/len(times))
