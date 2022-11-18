@@ -87,3 +87,4 @@ if __name__ == "__main__":
     print(min_val)
     print("Czas:", end=" ")
     print(sum(times)/len(times))
+    k = input("press close to exit")
