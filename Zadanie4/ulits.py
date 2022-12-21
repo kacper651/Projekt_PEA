@@ -4,12 +4,14 @@ import tsplib95
 
 def load_matrix(file_name):
     lines = get_file_lines(file_name)
+    optimal_cost = lines[0]
+    lines.pop(0)
     lines.pop(0)
     adj_matrix = []
     for line in lines:
         adj_matrix.append([int(i) for i in line.split()])
 
-    return adj_matrix
+    return adj_matrix, optimal_cost
 
 
 def load_tsp(path):
@@ -31,16 +33,13 @@ def get_file_lines(filepath):
         return f.read().splitlines()
 
 
-def save_data(data):
-    config_lines = get_file_lines("config.ini")
-    output_file = config_lines[3]
-
+def save_data(data, output_file):
     if not os.path.exists(output_file):
         with open(output_file, 'w') as f:
-            f.write('droga;koszt;czas[s]\n')
+            f.write('plik;koszt;czas[s];błąd[%];parametr;droga\n')
 
     with open(output_file, 'a') as f:
-        f.write(f'{data[0]};{data[1]};{str(data[2]).replace(".", ",")}\n')
+        f.write(f'{data[4]};{data[1]};{str(data[2]).replace(".", ",")};{str(data[3]).replace(".", ",")};{str(data[5]).replace(".", ",")};{data[0]}\n')
 
 
 def print_matrix(matrix):

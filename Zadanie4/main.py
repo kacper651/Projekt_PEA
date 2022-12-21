@@ -14,10 +14,10 @@ def simulated_annealing(cities, T, alpha, stopping_T, stopping_iter):
     best_solution = current_solution.copy()
     best_distance = distance(current_solution, cities)
 
-    iter = 0
+    iterations = 0
 
     while T > stopping_T:
-        while iter < stopping_iter:
+        while iterations < stopping_iter:
             i = random.randint(0, n-1)
             j = random.randint(0, n-1)
 
@@ -32,8 +32,8 @@ def simulated_annealing(cities, T, alpha, stopping_T, stopping_iter):
                     if current_distance < best_distance:
                         best_solution = current_solution
                         best_distance = current_distance
-            iter += 1
-        iter = 0
+            iterations += 1
+        iterations = 0
         T = T*alpha
     duration = time.time() - start
 
@@ -58,27 +58,40 @@ def acceptance_probability(old_cost, new_cost, T):
 
 if __name__ == "__main__":
     config_lines = get_file_lines("config.ini")
-    graph = []
+    input_file = config_lines[1]
+    output_file = config_lines[3]
+    iter_times = int(config_lines[5])
+    start_T = int(config_lines[7])
+    alpha = float(config_lines[9])
+    end_T = float(config_lines[11])
+    epoque_n = int(config_lines[13])
 
-    if config_lines[1].endswith('.txt'):
-        graph = load_matrix(config_lines[1])
-    elif config_lines[1].endswith(('.tsp', '.atsp')):
+    graph = []
+    optimal_cost = 0
+
+    if input_file.endswith('.txt'):
+        graph, optimal_cost = load_matrix(config_lines[1])
+    elif input_file.endswith(('.tsp', '.atsp')):
         graph = load_tsp(config_lines[1])
 
     times = []
-    min_val = None
+    min_val = 0
     min_path = []
     min_vals = []
+    error = 0
+    errors = []
 
-    # for _ in range(int(config_lines[5])):
-    #     min_path, min_val, tsp_time = simulated_annealing(graph, 3000, 0.999, 1, 100)
-    #     min_vals.append(min_val)
-    #     times.append(tsp_time)
-    #
-    # # for tsp_time in times:
-    # #     save_data([min_path, min_val, tsp_time])
-    #
-    print_matrix(graph)
-    # print(int(sum(min_vals)/int(config_lines[5])))
-    # print(min_path)
-    # print(sum(times)/int(config_lines[5]))
+    # print_matrix(graph)
+
+    for _ in range(iter_times):
+        min_path, min_val, tsp_time = simulated_annealing(graph, start_T, alpha, end_T, epoque_n)
+        min_vals.append(min_val)
+        times.append(tsp_time)
+        error = (min_val - int(optimal_cost)) * 100 / int(optimal_cost)
+        errors.append(error)
+        save_data([min_path, min_val, tsp_time, error, input_file, epoque_n], output_file)
+        epoque_n += 100
+
+    print(f'Średni błąd: {sum(errors)/len(errors)}[%]')
+    print(f'Średni czas: {sum(times)/len(times)}[s]')
+    print(f'Średni koszt: {sum(min_vals)/len(min_vals)}')
