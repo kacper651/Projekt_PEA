@@ -5,8 +5,6 @@ import tsplib95
 def load_matrix(file_name):
     lines = get_file_lines(file_name)
     lines.pop(0)
-    for line in lines:
-        line.strip()
     adj_matrix = []
     for line in lines:
         adj_matrix.append([int(i) for i in line.split()])
