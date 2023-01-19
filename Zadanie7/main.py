@@ -7,6 +7,7 @@ from utils import *
 def ant_colony_optimization(graph, n_ants, n_iterations, alpha=1, beta=1, rho=0.5, q=1):
     # Initialize the pheromone matrix
     pheromone = np.ones((graph.shape[0], graph.shape[1])) / graph.shape[0]
+    best_ant = None
 
     # Perform the ant colony optimization
     for i in range(n_iterations):
@@ -97,4 +98,27 @@ def _update_pheromone(graph, pheromone, ant, rho, q):
 
 
 if __name__ == "__main__":
-    print("XD")
+    config_lines = get_file_lines("config.ini")
+    input_file = config_lines[1]
+    output_file = config_lines[3]
+    iter_times = int(config_lines[5])
+
+    graph = []
+    optimal_cost = 0
+
+    if input_file.endswith('.txt'):
+        graph, optimal_cost = load_matrix(config_lines[1])
+    elif input_file.endswith(('.tsp', '.atsp')):
+        graph = load_tsp(config_lines[1])
+
+    times = []
+    min_val = 0
+    min_path = []
+    min_vals = []
+    error = 0
+    errors = []
+    graph = np.array(graph)
+
+    ant_colony_optimization(graph, 100, 10)
+    min_path = ant_colony_optimization(graph, 10, 10)
+    print(min_path)
