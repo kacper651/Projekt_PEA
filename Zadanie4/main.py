@@ -90,8 +90,11 @@ if __name__ == "__main__":
         error = (min_val - int(optimal_cost)) * 100 / int(optimal_cost)
         errors.append(error)
         #save_data([min_path, min_val, tsp_time, error, input_file, epoque_n], output_file)
-        epoque_n += 100
-
+        
+    print(f'Wielkość instancji: {len(graph)}')
     print(f'Średni błąd: {sum(errors)/len(errors)}[%]')
     print(f'Średni czas: {sum(times)/len(times)}[s]')
     print(f'Średni koszt: {sum(min_vals)/len(min_vals)}')
+
+k=input("press close to exit")
+
