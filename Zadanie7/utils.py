@@ -45,5 +45,5 @@ def save_data(data, output_file):
 def print_matrix(matrix):
     for row in matrix:
         for val in row:
-            print(val, end=" ")
+            print(f"{val: <4}", end=" ")
         print()

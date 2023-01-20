@@ -1,100 +1,116 @@
-# import the necessary packages
 import numpy as np
+import time
 from utils import *
 
 
-# Define the ant colony optimization algorithm
-def ant_colony_optimization(graph, n_ants, n_iterations, alpha=1, beta=1, rho=0.5, q=1):
-    # Initialize the pheromone matrix
-    pheromone = np.ones((graph.shape[0], graph.shape[1])) / graph.shape[0]
-    best_ant = None
+# ant colony optimization algorithm with parameters: alpha, beta, rho, Q, n_ants, n_iterations
+def aco(alpha, beta, rho, Q, n_ants, n_iterations, graph):
+    # initialize pheromone trails
+    pheromone = np.ones((graph.shape[0], graph.shape[0]))
+    pheromone /= graph.shape[0]
 
-    # Perform the ant colony optimization
+    # initialize best length (for now big number)
+    best_length = np.inf
+    # initialize best path (for now empty)
+    best_path = []
+
+    # for each iteration
     for i in range(n_iterations):
-        # Create the ants
-        ants = [_create_ant(graph, pheromone, alpha, beta) for j in range(n_ants)]
+        # initialize length of paths for all ants (for now big number)
+        length = np.ones(n_ants) * np.inf
+        # initialize paths for all ants (for now empty)
+        paths = []
 
-        # Calculate the tour length of each ant
-        ant_scores = [_tour_length(graph, ant) for ant in ants]
+        # for each ant
+        for j in range(n_ants):
+            # initialize path with starting node
+            path = [0]
+            # initialize tabu list with starting node
+            tabu = [0]
+            # initialize current node
+            current = 0
 
-        # Get the best ant
-        best_ant = ants[np.argmin(ant_scores)]
+            # while not all nodes visited
+            while len(tabu) < graph.shape[0]:
+                # select next node with roulette wheel selection
+                next_node = roulette_wheel_selection(current, alpha, beta, tabu, pheromone, graph)
+                # add node to tabu list
+                tabu.append(next_node)
+                # add node to path
+                path.append(next_node)
+                # update current node
+                current = next_node
 
-        # Update the pheromone matrix
-        pheromone = _update_pheromone(graph, pheromone, best_ant, rho, q)
+            # add return to depot to path
+            path.append(0)
+            # calculate length of path
+            length[j] = calculate_length(path, graph)
+            # add path to paths
+            paths.append(path)
 
-    return best_ant
+        # update pheromone trails
+        pheromone = update_pheromone(pheromone, paths, length, Q, rho)
 
+        # update best length and path
+        min_index = np.argmin(length)
+        if length[min_index] < best_length:
+            best_length = length[min_index]
+            best_path = paths[min_index]
 
-# Define the function to create an ant
-def _create_ant(graph, pheromone, alpha, beta):
-    # Set the initial node
-    ant = [np.random.choice(graph.shape[0])]
+        # print progress
+        # print('Iteration: {}, best length: {}'.format(i, best_length))
 
-    # Select the next node
-    for i in range(graph.shape[0] - 1):
-        # Get the current node
-        current_node = ant[-1]
-
-        # Calculate the transition probabilities
-        transition_probabilities = _transition_probabilities(graph, pheromone, current_node, alpha, beta)
-
-        # Select the next node
-        next_node = np.random.choice(graph.shape[0], p=transition_probabilities)
-
-        # Append the next node to the ant's path
-        ant.append(next_node)
-
-    return ant
-
-
-# Define the transition probabilities
-def _transition_probabilities(graph, pheromone, current_node, alpha, beta):
-    # Initialize an array of probabilities
-    probabilities = np.zeros(graph.shape[0])
-
-    # Calculate the denominator
-    total = 0
-    for i in range(graph.shape[0]):
-        if i != current_node:
-            total += np.power(pheromone[current_node, i], alpha) * np.power(1 / graph[current_node, i], beta)
-
-        # Calculate each transition probability
-    for i in range(graph.shape[0]):
-        if i == current_node:
-            probabilities[i] = 0
-        else:
-            numerator = np.power(pheromone[current_node, i], alpha) * np.power(1 / graph[current_node, i], beta)
-            probabilities[i] = numerator / total
-
-    return probabilities
+    return best_length, best_path
 
 
-# Define the tour length
-def _tour_length(graph, ant):
-    # Initialize the tour length
-    tour_length = 0
+# roulette wheel selection
+def roulette_wheel_selection(current, alpha, beta, tabu, pheromone, distance):
+    # initialize numerator
+    numerator = np.zeros(distance.shape[0])
+    # for each node
+    for i in range(distance.shape[0]):
+        # if node not in tabu list
+        if i not in tabu:
+            # calculate numerator
+            numerator[i] = (pheromone[current][i] ** alpha) * ((1.0 / distance[current][i]) ** beta)
 
-    # Calculate the tour length
-    for i in range(len(ant) - 1):
-        tour_length += graph[ant[i], ant[i + 1]]
+    # calculate denominator
+    denominator = np.sum(numerator)
+    # calculate probabilities
+    probabilities = numerator / denominator
+    # calculate cumsum of probabilities
+    probabilities = np.cumsum(probabilities)
+    # generate random number
+    r = np.random.random()
+    # select next node with roulette wheel selection
+    for i, probability in enumerate(probabilities):
+        if r < probability:
+            return i
 
-    # Add the tour length from the last to the first node
-    tour_length += graph[ant[-1], ant[0]]
 
-    return tour_length
+# update pheromone trails
+def update_pheromone(pheromone, paths, length, Q, rho):
+    # for each path
+    for i in range(len(paths)):
+        # for each arc in path
+        for j in range(len(paths[i]) - 1):
+            # update pheromone trail
+            pheromone[paths[i][j]][paths[i][j + 1]] = (1 - rho) * pheromone[paths[i][j]][paths[i][j + 1]] + (
+                        Q / length[i])
+            pheromone[paths[i][j + 1]][paths[i][j]] = pheromone[paths[i][j]][paths[i][j + 1]]
+
+    return pheromone
 
 
-# Define the function to update the pheromone matrix
-def _update_pheromone(graph, pheromone, ant, rho, q):
-    # Calculate the pheromone deposition
-    pheromone_deposition = np.zeros(graph.shape)
-    for i in range(len(ant) - 1):
-        pheromone_deposition[ant[i], ant[i + 1]] = q / _tour_length(graph, ant)
-    pheromone_deposition[ant[-1], ant[0]] = q / _tour_length(graph, ant)
+# calculate length of path
+def calculate_length(path, distance):
+    length = 0
+    # for each arc in path
+    for i in range(len(path) - 1):
+        # add length of arc to path length
+        length += distance[path[i]][path[i + 1]]
 
-    # Update the pheromone matrix
-    return (1 - rho) * pheromone + pheromone_deposition
+    return length
 
 
 if __name__ == "__main__":
@@ -102,6 +118,12 @@ if __name__ == "__main__":
     input_file = config_lines[1]
     output_file = config_lines[3]
     iter_times = int(config_lines[5])
+    alpha = float(config_lines[7])
+    beta = float(config_lines[9])
+    rho = float(config_lines[11])
+    Q = float(config_lines[13])
+    n_ants = int(config_lines[15])
+    n_iterations = int(config_lines[17])
 
     graph = []
     optimal_cost = 0
@@ -119,6 +141,26 @@ if __name__ == "__main__":
     errors = []
     graph = np.array(graph)
 
-    ant_colony_optimization(graph, 100, 10)
-    min_path = ant_colony_optimization(graph, 10, 10)
-    print(min_path)
+    print("Running ACO...")
+    print("Input file: " + input_file[8:])
+    print("Parameters: alpha = " + str(alpha) +
+          ", beta = " + str(beta) + ", rho = " +
+          str(rho) + ", Q = " + str(Q) + ", no. ants = " +
+          str(n_ants) + ", no. iterations = " + str(n_iterations))
+    if len(graph) < 30:
+        print("Graph:")
+        print_matrix(graph)
+
+    for i in range(iter_times):
+        start_time = time.time()
+        min_val, min_path = aco(alpha, beta, rho, Q, n_ants, n_iterations, graph)
+        end_time = time.time()
+        times.append(end_time - start_time)
+        min_vals.append(min_val)
+        error = np.divide(np.subtract(min_val, int(optimal_cost)), int(optimal_cost)) * 100
+        errors.append(error)
+
+    print("Average time: ", np.mean(times))
+    print("Average error[%]: ", np.mean(errors))
+    print("Average cost: ", np.mean(min_vals))
+    print("Shortest path: ", min_path)
