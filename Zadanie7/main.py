@@ -9,9 +9,9 @@ def aco(alpha, beta, rho, Q, n_ants, n_iterations, graph):
     pheromone = np.ones((graph.shape[0], graph.shape[0]))
     pheromone /= graph.shape[0]
 
-    # initialize best length (for now big number)
+    # initialize the best length (for now big number)
     best_length = np.inf
-    # initialize best path (for now empty)
+    # initialize the best path (for now empty)
     best_path = []
 
     # for each iteration
@@ -51,28 +51,25 @@ def aco(alpha, beta, rho, Q, n_ants, n_iterations, graph):
         # update pheromone trails
         pheromone = update_pheromone(pheromone, paths, length, Q, rho)
 
-        # update best length and path
+        # update the best length and path
         min_index = np.argmin(length)
         if length[min_index] < best_length:
             best_length = length[min_index]
             best_path = paths[min_index]
 
-        # print progress
-        # print('Iteration: {}, best length: {}'.format(i, best_length))
-
     return best_length, best_path
 
 
 # roulette wheel selection
-def roulette_wheel_selection(current, alpha, beta, tabu, pheromone, distance):
+def roulette_wheel_selection(current, alpha, beta, tabu, pheromone, graph):
     # initialize numerator
-    numerator = np.zeros(distance.shape[0])
+    numerator = np.zeros(graph.shape[0])
     # for each node
-    for i in range(distance.shape[0]):
+    for i in range(graph.shape[0]):
         # if node not in tabu list
         if i not in tabu:
             # calculate numerator
-            numerator[i] = (pheromone[current][i] ** alpha) * ((1.0 / distance[current][i]) ** beta)
+            numerator[i] = (pheromone[current][i] ** alpha) * ((1.0 / graph[current][i]) ** beta)
 
     # calculate denominator
     denominator = np.sum(numerator)
@@ -103,12 +100,12 @@ def update_pheromone(pheromone, paths, length, Q, rho):
 
 
 # calculate length of path
-def calculate_length(path, distance):
+def calculate_length(path, graph):
     length = 0
     # for each arc in path
     for i in range(len(path) - 1):
         # add length of arc to path length
-        length += distance[path[i]][path[i + 1]]
+        length += graph[path[i]][path[i + 1]]
 
     return length
 
@@ -147,9 +144,6 @@ if __name__ == "__main__":
           ", beta = " + str(beta) + ", rho = " +
           str(rho) + ", Q = " + str(Q) + ", no. ants = " +
           str(n_ants) + ", no. iterations = " + str(n_iterations))
-    if len(graph) < 30:
-        print("Graph:")
-        print_matrix(graph)
 
     for i in range(iter_times):
         start_time = time.time()
@@ -160,6 +154,9 @@ if __name__ == "__main__":
         error = np.divide(np.subtract(min_val, int(optimal_cost)), int(optimal_cost)) * 100
         errors.append(error)
 
+    if len(graph) < 30:
+        print("Graph:")
+        print_matrix(graph)
     print("Average time: ", np.mean(times))
     print("Average error[%]: ", np.mean(errors))
     print("Average cost: ", np.mean(min_vals))

@@ -39,7 +39,9 @@ def save_data(data, output_file):
             f.write('plik;koszt;czas[s];błąd[%];parametr;droga\n')
 
     with open(output_file, 'a') as f:
-        f.write(f'{data[4]};{data[1]};{str(data[2]).replace(".", ",")};{str(data[3]).replace(".", ",")};{str(data[5]).replace(".", ",")};{data[0]}\n')
+        f.write(f'{data[4]};{data[1]};{str(data[2]).replace(".", ",")};'
+                f'{str(data[3]).replace(".", ",")};'
+                f'{str(data[5]).replace(".", ",")};{data[0]}\n')
 
 
 def print_matrix(matrix):
