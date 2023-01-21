@@ -6,8 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="04d8888c-3c33-41c1-8d56-ccdccb611b8f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/aco.py" beforeDir="false" afterPath="$PROJECT_DIR$/aco.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/br17.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/gr17.tsp" beforeDir="false" afterPath="$PROJECT_DIR$/input/gr17.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/kro124p.txt" beforeDir="false" afterPath="$PROJECT_DIR$/input/kro124p.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sprawko/PEA7_Wróblewski.docx" beforeDir="false" afterPath="$PROJECT_DIR$/sprawko/PEA7_Wróblewski.docx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +37,9 @@
     <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectId" id="2KBPLaurgZI8ftcC7Pkss957FO2" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -86,7 +94,8 @@
       <workItem from="1673536178588" duration="127000" />
       <workItem from="1674125261655" duration="5660000" />
       <workItem from="1674225562400" duration="13833000" />
-      <workItem from="1674303285654" duration="8754000" />
+      <workItem from="1674303285654" duration="17544000" />
+      <workItem from="1674321719509" duration="14105000" />
     </task>
     <servers />
   </component>
@@ -106,6 +115,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Zadanie7$main.coverage" NAME="main Coverage Results" MODIFIED="1674131789803" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1674312109173" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1674336016673" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

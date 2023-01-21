@@ -3,7 +3,16 @@ from utils import *
 from aco import *
 
 
-if __name__ == "__main__":
+def get_optimal_cost():
+    tsp_dict = {}
+    with open("./input/TSPs.txt") as f:
+        for line in f:
+            (key, val) = line.split(":")
+            tsp_dict[key] = val[:-1]
+    return tsp_dict
+
+
+def run_single_solver():
     # read config file
     config_lines = get_file_lines("config.ini")
     input_file = config_lines[1]
@@ -18,20 +27,26 @@ if __name__ == "__main__":
     heuristic = config_lines[19].lower()
     # initialize graph
     graph = []
+    # initialize optimal cost
     optimal_cost = 0
     # check file extension
     if input_file.endswith('.txt'):
-        graph, optimal_cost = load_matrix(config_lines[1])
-    elif input_file.endswith(('.tsp', '.atsp')):
-        graph = load_tsp(config_lines[1])
+        graph = read_matrix(config_lines[1])
+    elif input_file.endswith('.tsp'):
+        graph = read_matrix(config_lines[1])
+        optimal_cost = get_optimal_cost()[input_file[8:-4]]
+    elif input_file.endswith('.atsp'):
+        graph = read_matrix(config_lines[1])
+        optimal_cost = get_optimal_cost()[input_file[8:-5]]
     # initialize research variables
     times = []
-    min_val = 0
     min_path = []
     min_vals = []
-    error = 0
     errors = []
     graph = np.array(graph)
+    # n_ants == n_cities
+    if n_ants == 0:
+        n_ants = len(graph)
     # run algorithm
     print("Running ACO...")
     print("Input file: " + input_file[8:])
@@ -57,7 +72,12 @@ if __name__ == "__main__":
         min_vals.append(min_val)
         error = np.divide(np.subtract(min_val, int(optimal_cost)), int(optimal_cost)) * 100
         errors.append(error)
-    print("Average time: ", np.mean(times))
-    print("Average error[%]: ", np.mean(errors))
+    print("Average time: ", np.mean(times).round(3))
+    print("Average error[%]: ", np.mean(errors).round(3))
     print("Average cost: ", np.mean(min_vals))
     print("Shortest path: ", min_path)
+    # save_data([input_file[8:], np.mean(min_vals), np.mean(times).round(3), np.mean(errors).round(3), update_method, heuristic, min_path], output_file, input_file)
+
+
+if __name__ == "__main__":
+    run_single_solver()

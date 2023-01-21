@@ -23,11 +23,11 @@ def aco(alpha, beta, rho, ants, iterations, graph, pheromone_update_method, choi
         # for each ant
         for j in range(ants):
             # initialize path with starting node
-            path = [0]
+            path = [np.random.randint(0, graph.shape[0])]
             # initialize tabu list with starting node
-            tabu = [0]
+            tabu = [path[0]]
             # initialize current node
-            current = 0
+            current = path[0]
             # while not all nodes visited
             while len(tabu) < graph.shape[0]:
                 # select next node with roulette wheel selection
@@ -39,13 +39,14 @@ def aco(alpha, beta, rho, ants, iterations, graph, pheromone_update_method, choi
                 # update current node
                 current = next_node
             # add return to starting node to path
-            path.append(0)
+            path.append(path[0])
             # calculate length of path
             length[j] = calculate_length(path, graph)
             # add path to paths
             paths.append(path)
-            # update frequency factor
-            frequency_factor = calculate_frequency_factor(paths, graph)
+            if choice_heuristic == 'frequency factor':
+                # update frequency factor
+                frequency_factor = calculate_frequency_factor(paths, frequency_factor)
         # update pheromone trails
         pheromone = update_pheromone(pheromone, paths, length, Q, rho, pheromone_update_method, graph)
         # update the best length and path
@@ -57,8 +58,7 @@ def aco(alpha, beta, rho, ants, iterations, graph, pheromone_update_method, choi
 
 
 # calculate frequency factor
-def calculate_frequency_factor(paths, graph):
-    frequency_factor = np.zeros(graph.shape[0])
+def calculate_frequency_factor(paths, frequency_factor):
     # for each path
     for i in range(len(paths)):
         # for each node in path
@@ -76,16 +76,16 @@ def route_selector(current, alpha, beta, tabu, pheromone, graph, heuristic_metho
         # for each node
         for i in range(graph.shape[0]):
             # if node not in tabu list
-            if i not in tabu:
+            if i not in tabu and i != current and graph[current][i] != 0:
                 # calculate numerator
-                numerator[i] = (pheromone[current][i] ** alpha) * ((1.0 / graph[current][i]) ** beta)
+                numerator[i] = float((pheromone[current][i] ** alpha) * ((1.0 / graph[current][i]) ** beta))
     elif heuristic_method == 'frequency factor':
         # for each node
         for i in range(graph.shape[0]):
             # if node not in tabu list
-            if i not in tabu:
+            if i not in tabu and i != current:
                 # calculate numerator
-                numerator[i] = ((pheromone[current][i] ** alpha) * (frequency_factor[current]) / graph[current][i]) ** beta  # ((1.0 / graph[current][i]) ** beta) * (1.0 / graph[current][i])
+                numerator[i] = (pheromone[current][i] ** alpha) * (1.0 / (frequency_factor[current] * graph[current][i]) ** beta)
     # calculate denominator
     denominator = np.sum(numerator)
     # calculate probabilities
@@ -102,20 +102,24 @@ def route_selector(current, alpha, beta, tabu, pheromone, graph, heuristic_metho
 
 # update pheromone trails according to chosen method
 def update_pheromone(pheromone, paths, length, Q, rho, method, graph):
+    # for each city
+    for i in range(graph.shape[0]):
+        for j in range(graph.shape[0]):
+            if i != j:
+                pheromone[i][j] *= (1 - rho)  # evaporation
+
     # for each path
-    for i in range(len(paths)):
+    for i in range(len(paths)-1):
         # for each arc in path
-        for j in range(len(paths[i]) - 1):
+        for j in range(len(paths[i])-1):
             # update pheromone trail
-            if method == 'QAS':
-                pheromone[paths[i][j]][paths[i][j + 1]] = (1 - rho) * pheromone[paths[i][j]][paths[i][j + 1]] + (Q / graph[i][j])
-                pheromone[paths[i][j + 1]][paths[i][j]] = pheromone[paths[i][j]][paths[i][j + 1]]
-            elif method == 'DAS':
-                pheromone[paths[i][j]][paths[i][j + 1]] = (1 - rho) * pheromone[paths[i][j]][paths[i][j + 1]] + Q
-                pheromone[paths[i][j + 1]][paths[i][j]] = pheromone[paths[i][j]][paths[i][j + 1]]
-            elif method == 'CAS':
-                pheromone[paths[i][j]][paths[i][j + 1]] = (1 - rho) * pheromone[paths[i][j]][paths[i][j + 1]] + Q / (length[i] ** i)
-                pheromone[paths[i][j + 1]][paths[i][j]] = pheromone[paths[i][j]][paths[i][j + 1]]
+            if i != j:
+                if method == 'QAS':
+                    pheromone[paths[i][j]][paths[i][j]] += (Q / graph[i][j])
+                elif method == 'DAS':
+                    pheromone[paths[i][j]][paths[i][j]] += Q
+                elif method == 'CAS':
+                    pheromone[paths[i][j]][paths[i][j]] += Q / length[i] ** i
     return pheromone
 
 
