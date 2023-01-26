@@ -38,15 +38,15 @@ def aco(alpha, beta, rho, ants, iterations, graph, pheromone_update_method, choi
                 path.append(next_node)
                 # update current node
                 current = next_node
+                if choice_heuristic == 'frequency factor':
+                    # update frequency factor
+                    frequency_factor = calculate_frequency_factor(paths, frequency_factor)
             # add return to starting node to path
             path.append(path[0])
             # calculate length of path
             length[j] = calculate_length(path, graph)
             # add path to paths
             paths.append(path)
-            if choice_heuristic == 'frequency factor':
-                # update frequency factor
-                frequency_factor = calculate_frequency_factor(paths, frequency_factor)
         # update pheromone trails
         pheromone = update_pheromone(pheromone, paths, length, Q, rho, pheromone_update_method, graph)
         # update the best length and path
@@ -78,14 +78,14 @@ def route_selector(current, alpha, beta, tabu, pheromone, graph, heuristic_metho
             # if node not in tabu list
             if i not in tabu and i != current and graph[current][i] != 0:
                 # calculate numerator
-                numerator[i] = float((pheromone[current][i] ** alpha) * ((1.0 / graph[current][i]) ** beta))
+                numerator[i] = (pheromone[current][i] ** alpha) * ((1.0 / graph[current][i]) ** beta)
     elif heuristic_method == 'frequency factor':
         # for each node
         for i in range(graph.shape[0]):
             # if node not in tabu list
-            if i not in tabu and i != current:
+            if i not in tabu and i != current and graph[current][i] != 0:
                 # calculate numerator
-                numerator[i] = (pheromone[current][i] ** alpha) * (1.0 / (frequency_factor[current] * graph[current][i]) ** beta)
+                numerator[i] = (pheromone[current][i] ** alpha) * (((frequency_factor[i]) / graph[current][i]) ** beta)
     # calculate denominator
     denominator = np.sum(numerator)
     # calculate probabilities
@@ -107,7 +107,6 @@ def update_pheromone(pheromone, paths, length, Q, rho, method, graph):
         for j in range(graph.shape[0]):
             if i != j:
                 pheromone[i][j] *= (1 - rho)  # evaporation
-
     # for each path
     for i in range(len(paths)-1):
         # for each arc in path
@@ -119,7 +118,7 @@ def update_pheromone(pheromone, paths, length, Q, rho, method, graph):
                 elif method == 'DAS':
                     pheromone[paths[i][j]][paths[i][j]] += Q
                 elif method == 'CAS':
-                    pheromone[paths[i][j]][paths[i][j]] += Q / length[i] ** i
+                    pheromone[paths[i][j]][paths[i][j]] += Q / length[i]
     return pheromone
 
 

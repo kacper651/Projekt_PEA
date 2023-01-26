@@ -71,7 +71,7 @@ def save_data(data, output_file, input_file):
                 f'{str(data[3]).replace(".", ",")};'
                 f'{data[4]};'
                 f'{data[5]};'
-                f'{data[6]}')
+                f'{data[6]}\n')
 
 
 def print_matrix(matrix):

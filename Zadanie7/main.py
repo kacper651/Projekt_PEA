@@ -12,10 +12,10 @@ def get_optimal_cost():
     return tsp_dict
 
 
-def run_single_solver():
+def run_single_solver(input_file):
     # read config file
     config_lines = get_file_lines("config.ini")
-    input_file = config_lines[1]
+    # input_file = config_lines[1]
     output_file = config_lines[3]
     iter_times = int(config_lines[5])
     alpha = float(config_lines[7])
@@ -31,12 +31,12 @@ def run_single_solver():
     optimal_cost = 0
     # check file extension
     if input_file.endswith('.txt'):
-        graph = read_matrix(config_lines[1])
+        graph = read_matrix(input_file)
     elif input_file.endswith('.tsp'):
-        graph = read_matrix(config_lines[1])
+        graph = read_matrix(input_file)
         optimal_cost = get_optimal_cost()[input_file[8:-4]]
     elif input_file.endswith('.atsp'):
-        graph = read_matrix(config_lines[1])
+        graph = read_matrix(input_file)
         optimal_cost = get_optimal_cost()[input_file[8:-5]]
     # initialize research variables
     times = []
@@ -64,6 +64,7 @@ def run_single_solver():
         print(f'Invalid heuristic "{heuristic}", using default visibility')
         heuristic = 'visibility'
     print("Heuristic: " + heuristic)
+    print("Running " + str(iter_times) + " iteration(s)...")
     for i in range(iter_times):
         start_time = time.time()
         min_val, min_path = aco(alpha, beta, rho, n_ants, n_iterations, graph, update_method, heuristic)
@@ -72,12 +73,25 @@ def run_single_solver():
         min_vals.append(min_val)
         error = np.divide(np.subtract(min_val, int(optimal_cost)), int(optimal_cost)) * 100
         errors.append(error)
+    save_data([input_file[8:], np.mean(min_vals), np.mean(times).round(3), np.mean(errors).round(3), update_method,
+               heuristic, min_path], output_file, input_file)
     print("Average time: ", np.mean(times).round(3))
     print("Average error[%]: ", np.mean(errors).round(3))
     print("Average cost: ", np.mean(min_vals))
     print("Shortest path: ", min_path)
-    # save_data([input_file[8:], np.mean(min_vals), np.mean(times).round(3), np.mean(errors).round(3), update_method, heuristic, min_path], output_file, input_file)
+    print()
 
 
 if __name__ == "__main__":
-    run_single_solver()
+    # TESTOWAĆ OSOBNO DLA ./input/rbg323.tsp i "./input/Rbg443.atsp"
+
+    config_lines = get_file_lines("config.ini")
+    instances = ["./input/Burma14.tsp", "./input/Gr17.tsp", "./input/Gr21.tsp", "./input/Gr24.tsp",
+                 "./input/Bays29.tsp", "./input/Ftv33.atsp", "./input/Ftv44.atsp", "./input/Ft53.atsp",
+                 "./input/Ch150.tsp", "./input/Ftv170.atsp", "./input/Gr202.tsp", "./input/Pcb442.tsp",
+                 "./input/Gr666.tsp", "./input/Pr1002.tsp", "./input/Pr2392.tsp"]
+    # for input_file in instances:
+    #     run_single_solver(input_file.lower())
+
+    run_single_solver(config_lines[1].lower())
+    k = input("Press any key to exit...")
